@@ -13,6 +13,18 @@ use App\Contracts\ProviderRegistryInterface;
 use App\Contracts\QuotaServiceInterface;
 use App\Contracts\RateLimiterInterface;
 use App\Contracts\RetryableInterface;
+use App\Events\ApiKeyCreated;
+use App\Events\CircuitBreakerStateChanged;
+use App\Events\LookupCompleted;
+use App\Events\LookupFailed;
+use App\Events\QuotaExceeded;
+use App\Listeners\CacheResultListener;
+use App\Listeners\IncrementQuotaListener;
+use App\Listeners\LogApiKeyCreatedListener;
+use App\Listeners\LogCircuitBreakerChangeListener;
+use App\Listeners\LogLookupFailureListener;
+use App\Listeners\LogLookupListener;
+use App\Listeners\LogQuotaExceededListener;
 use App\Repositories\EloquentApiKeyRepository;
 use App\Repositories\EloquentLookupResultRepository;
 use App\Services\Cache\LookupCacheService;
@@ -22,6 +34,7 @@ use App\Services\Quota\QuotaService;
 use App\Services\RateLimiter\RateLimiterService;
 use App\Services\Retry\RetryService;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -101,6 +114,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Event-Listener mappings
+        Event::listen(LookupCompleted::class, LogLookupListener::class);
+        Event::listen(LookupCompleted::class, IncrementQuotaListener::class);
+        Event::listen(LookupCompleted::class, CacheResultListener::class);
+        Event::listen(LookupFailed::class, LogLookupFailureListener::class);
+        Event::listen(CircuitBreakerStateChanged::class, LogCircuitBreakerChangeListener::class);
+        Event::listen(QuotaExceeded::class, LogQuotaExceededListener::class);
+        Event::listen(ApiKeyCreated::class, LogApiKeyCreatedListener::class);
     }
 }
