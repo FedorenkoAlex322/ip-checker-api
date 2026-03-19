@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Redis;
 final class QuotaService implements QuotaServiceInterface
 {
     private const int DAILY_TTL = 86400 + 3600;   // 25 hours buffer
+
     private const int MONTHLY_TTL = 86400 * 35;   // 35 days buffer
 
     public function check(int $apiKeyId): QuotaStatus
@@ -114,11 +115,11 @@ final class QuotaService implements QuotaServiceInterface
 
     private function getDailyKey(int $apiKeyId): string
     {
-        return "quota:{$apiKeyId}:daily:" . now()->format('Y-m-d');
+        return "quota:{$apiKeyId}:daily:".now()->format('Y-m-d');
     }
 
     private function getMonthlyKey(int $apiKeyId): string
     {
-        return "quota:{$apiKeyId}:monthly:" . now()->format('Y-m');
+        return "quota:{$apiKeyId}:monthly:".now()->format('Y-m');
     }
 }

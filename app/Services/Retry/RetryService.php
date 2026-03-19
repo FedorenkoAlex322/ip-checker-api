@@ -21,7 +21,7 @@ final class RetryService implements RetryableInterface
             } catch (\Throwable $e) {
                 $lastException = $e;
 
-                if (!$this->isRetryable($e, $config)) {
+                if (! $this->isRetryable($e, $config)) {
                     throw $e;
                 }
 

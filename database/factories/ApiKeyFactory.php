@@ -41,7 +41,7 @@ class ApiKeyFactory extends Factory
 
         return [
             'key_hash' => hash('sha256', Str::random(40)),
-            'name' => $this->faker->company() . ' API Key',
+            'name' => $this->faker->company().' API Key',
             'tier' => $tier,
             'daily_limit' => $defaults['daily_limit'],
             'monthly_limit' => $defaults['monthly_limit'],

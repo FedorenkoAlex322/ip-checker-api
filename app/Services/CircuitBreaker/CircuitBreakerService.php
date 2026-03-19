@@ -6,6 +6,7 @@ namespace App\Services\CircuitBreaker;
 
 use App\Contracts\CircuitBreakerInterface;
 use App\Enums\CircuitState;
+use Illuminate\Redis\Connections\Connection;
 use Illuminate\Support\Facades\Redis;
 
 final class CircuitBreakerService implements CircuitBreakerInterface
@@ -109,11 +110,11 @@ final class CircuitBreakerService implements CircuitBreakerInterface
      */
     public function getAllStates(): array
     {
-        $pattern = $this->prefix . ':*';
+        $pattern = $this->prefix.':*';
         $prefixLength = strlen($this->prefix) + 1;
         $states = [];
 
-        /** @var \Illuminate\Redis\Connections\Connection $connection */
+        /** @var Connection $connection */
         $connection = Redis::connection();
         $cursor = null;
 
@@ -135,14 +136,13 @@ final class CircuitBreakerService implements CircuitBreakerInterface
     /**
      * Execute a read-modify-write cycle atomically using Redis WATCH/MULTI/EXEC.
      *
-     * @param string $service
-     * @param callable(array): array $callback
+     * @param  callable(array): array  $callback
      */
     private function atomic(string $service, callable $callback): void
     {
         $key = $this->getRedisKey($service);
 
-        /** @var \Illuminate\Redis\Connections\Connection $connection */
+        /** @var Connection $connection */
         $connection = Redis::connection();
 
         $retries = 3;
@@ -194,7 +194,7 @@ final class CircuitBreakerService implements CircuitBreakerInterface
     }
 
     /**
-     * @param array{state: string, failure_count: int, success_count: int, last_failure_at: int|null, opened_at: int|null} $data
+     * @param  array{state: string, failure_count: int, success_count: int, last_failure_at: int|null, opened_at: int|null}  $data
      */
     private function saveData(string $service, array $data): void
     {
@@ -219,7 +219,7 @@ final class CircuitBreakerService implements CircuitBreakerInterface
 
     private function getRedisKey(string $service): string
     {
-        return $this->prefix . ':' . $service;
+        return $this->prefix.':'.$service;
     }
 
     /**

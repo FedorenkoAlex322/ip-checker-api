@@ -51,8 +51,8 @@ class LookupResultFactory extends Factory
                 'created_date' => $this->faker->date(),
                 'expires_date' => $this->faker->dateTimeBetween('now', '+3 years')->format('Y-m-d'),
                 'name_servers' => [
-                    'ns1.' . $this->faker->domainName(),
-                    'ns2.' . $this->faker->domainName(),
+                    'ns1.'.$this->faker->domainName(),
+                    'ns2.'.$this->faker->domainName(),
                 ],
                 'status' => 'active',
             ],
@@ -69,7 +69,7 @@ class LookupResultFactory extends Factory
                 'deliverable' => $this->faker->boolean(80),
                 'disposable' => false,
                 'mx_records' => [
-                    'mx1.' . $this->faker->domainName(),
+                    'mx1.'.$this->faker->domainName(),
                 ],
                 'smtp_valid' => true,
             ],
@@ -96,7 +96,7 @@ class LookupResultFactory extends Factory
             'longitude' => (float) $this->faker->longitude(),
             'isp' => $this->faker->company(),
             'org' => $this->faker->company(),
-            'asn' => 'AS' . $this->faker->numberBetween(1000, 65000),
+            'asn' => 'AS'.$this->faker->numberBetween(1000, 65000),
             'timezone' => $this->faker->timezone(),
         ];
     }
