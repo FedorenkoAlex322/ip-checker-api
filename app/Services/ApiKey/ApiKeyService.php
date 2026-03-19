@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Services\ApiKey;
 
 use App\Enums\ApiKeyTier;

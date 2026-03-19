@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use App\Jobs\PruneOldLookupsJob;
 use App\Jobs\SyncQuotaToDatabaseJob;
 use Illuminate\Support\Facades\Schedule;

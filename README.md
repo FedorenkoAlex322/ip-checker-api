@@ -18,12 +18,12 @@ Highload REST API for checking IP addresses, domains, and emails against multipl
 | Component | Technology |
 |-----------|-----------|
 | Framework | Laravel 13 |
-| Language | PHP 8.3+ (strict types) |
+| Language | PHP 8.3+ |
 | Database | MySQL 8.0 |
 | Cache/Queue/State | Redis 7 |
 | Web Server | Nginx |
 | Containers | Docker + docker-compose |
-| Static Analysis | PHPStan (Larastan) level 8 |
+| Static Analysis | PHPStan (Larastan) level 6 |
 | Code Style | Laravel Pint (PSR-12) |
 | Tests | PHPUnit (87 tests, 368 assertions) |
 
@@ -285,7 +285,7 @@ Test breakdown: 31 unit + 50 feature + 6 integration = **87 tests, 368 assertion
 ## Code Quality
 
 ```bash
-# Static analysis (PHPStan level 8)
+# Static analysis (PHPStan level 6)
 vendor/bin/phpstan analyse --memory-limit=512M
 
 # Code style (Laravel Pint / PSR-12)

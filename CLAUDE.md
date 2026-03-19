@@ -237,9 +237,9 @@ CACHE_TTL_DOMAIN_LOOKUP=3600  # 1 hour
 
 ## Code Standards
 
-- `declare(strict_types=1)` в каждом PHP файле
+- НЕ использовать `declare(strict_types=1)` — следуем конвенциям Laravel
 - PSR-12 code style (enforced via Laravel Pint)
-- PHPStan level 8+
+- PHPStan level 6 (Larastan)
 - Return type declarations на всех методах
 - Property type hints на всех свойствах
 - Form Requests для валидации
