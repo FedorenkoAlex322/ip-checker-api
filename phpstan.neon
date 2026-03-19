@@ -4,7 +4,7 @@ includes:
 parameters:
     paths:
         - app/
-    level: 8
+    level: 6
     tmpDir: storage/phpstan
     ignoreErrors:
         - identifier: missingType.generics

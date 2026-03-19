@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 return [
     'default' => [
         'failure_threshold' => (int) env('CIRCUIT_BREAKER_THRESHOLD', 5),
