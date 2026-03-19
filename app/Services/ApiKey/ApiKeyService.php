@@ -44,7 +44,7 @@ final class ApiKeyService
         $apiKey = ApiKey::where('key_hash', $hash)->first();
 
         if ($apiKey === null) {
-            throw new InvalidApiKeyException();
+            throw new InvalidApiKeyException;
         }
 
         if (! $apiKey->isUsable()) {

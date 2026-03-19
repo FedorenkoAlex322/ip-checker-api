@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use App\Services\Providers\MockProvider;
 
 return [
     /*
@@ -11,7 +12,7 @@ return [
     'providers' => [
         'mock' => [
             'enabled' => env('PROVIDER_MOCK_ENABLED', true),
-            'class' => \App\Services\Providers\MockProvider::class,
+            'class' => MockProvider::class,
             'priority' => 100,
             'supports' => ['ip', 'domain', 'email'],
             'delay_ms' => env('PROVIDER_MOCK_DELAY_MS', 50),

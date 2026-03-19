@@ -10,7 +10,9 @@ use Illuminate\Http\JsonResponse;
 abstract class ApiException extends \RuntimeException
 {
     protected ErrorCode $errorCode;
+
     protected int $httpStatusCode;
+
     protected ?int $retryAfter = null;
 
     public function __construct(
