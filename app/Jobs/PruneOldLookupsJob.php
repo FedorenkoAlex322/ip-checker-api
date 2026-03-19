@@ -26,8 +26,19 @@ final class PruneOldLookupsJob implements ShouldQueue
         $retentionDays = (int) config('ip-checker.log_retention_days', 90);
         $cutoff = now()->subDays($retentionDays);
 
-        $deletedLogs = LookupLog::where('created_at', '<', $cutoff)->delete();
-        $deletedResults = LookupResult::where('created_at', '<', $cutoff)->delete();
+        $deletedLogs = 0;
+        LookupLog::where('created_at', '<', $cutoff)
+            ->chunkById(1000, function ($logs) use (&$deletedLogs) {
+                $deletedLogs += $logs->count();
+                LookupLog::whereIn('id', $logs->pluck('id'))->delete();
+            });
+
+        $deletedResults = 0;
+        LookupResult::where('created_at', '<', $cutoff)
+            ->chunkById(1000, function ($results) use (&$deletedResults) {
+                $deletedResults += $results->count();
+                LookupResult::whereIn('id', $results->pluck('id'))->delete();
+            });
 
         Log::info('Pruned old lookups', [
             'retention_days' => $retentionDays,

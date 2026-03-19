@@ -12,6 +12,8 @@ use App\Contracts\RetryableInterface;
 use App\DTOs\LookupResult;
 use App\DTOs\RetryConfig;
 use App\Enums\LookupType;
+use App\Events\LookupCompleted;
+use App\Events\LookupFailed;
 use App\Exceptions\ProviderUnavailableException;
 use App\Models\LookupResult as LookupResultModel;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -92,8 +94,9 @@ final class LookupService
 
                 // 4. Success path
                 $this->circuitBreaker->recordSuccess($providerName);
-                $this->cache->put($target, $type, $result);
                 $this->resultRepository->store($result, $apiKeyId);
+
+                LookupCompleted::dispatch($result, $apiKeyId);
 
                 Log::info('LookupService: lookup succeeded', [
                     'target' => $target,
@@ -107,6 +110,8 @@ final class LookupService
                 // 5. Failure path — record and move to next provider
                 $lastException = $e;
                 $this->circuitBreaker->recordFailure($providerName);
+
+                LookupFailed::dispatch($target, $type, $apiKeyId, $e->getMessage(), $providerName);
 
                 Log::warning('LookupService: provider failed, trying next', [
                     'target' => $target,

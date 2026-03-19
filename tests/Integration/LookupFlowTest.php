@@ -11,8 +11,11 @@ use App\Contracts\RateLimiterInterface;
 use App\DTOs\QuotaStatus;
 use App\DTOs\RateLimitResult;
 use App\Enums\ApiKeyTier;
+use App\Events\LookupCompleted;
+use App\Events\LookupFailed;
 use App\Models\ApiKey;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 final class LookupFlowTest extends TestCase
@@ -234,5 +237,8 @@ final class LookupFlowTest extends TestCase
         $cb->shouldReceive('recordFailure')->andReturnNull();
         $cb->shouldReceive('getAllStates')->andReturn([]);
         $this->app->instance(CircuitBreakerInterface::class, $cb);
+
+        // Fake events to prevent listeners from calling real Redis
+        Event::fake([LookupCompleted::class, LookupFailed::class]);
     }
 }

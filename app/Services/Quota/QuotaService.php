@@ -100,7 +100,11 @@ final class QuotaService implements QuotaServiceInterface
             ->where('date', $date)
             ->first();
 
-        return $usage->request_count ?? 0;
+        if ($usage === null) {
+            return 0;
+        }
+
+        return $usage->request_count;
     }
 
     private function loadMonthlyFromDatabase(int $apiKeyId): int
