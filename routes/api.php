@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware([ForceJsonResponse::class])
     ->prefix('v1')
     ->group(function (): void {
-        Route::get('/health', [HealthController::class, 'show']);
+        Route::get('/health', [HealthController::class, 'show'])->name('v1.health');
     });
 
 // Protected API routes
@@ -30,12 +30,12 @@ Route::middleware([
     ->prefix('v1')
     ->group(function (): void {
         // Lookup endpoints
-        Route::post('/lookup/ip', [LookupController::class, 'ip']);
-        Route::post('/lookup/domain', [LookupController::class, 'domain']);
-        Route::post('/lookup/email', [LookupController::class, 'email']);
-        Route::get('/lookup/history', [LookupController::class, 'history']);
-        Route::get('/lookup/{uuid}', [LookupController::class, 'show']);
+        Route::post('/lookup/ip', [LookupController::class, 'ip'])->name('v1.lookup.ip');
+        Route::post('/lookup/domain', [LookupController::class, 'domain'])->name('v1.lookup.domain');
+        Route::post('/lookup/email', [LookupController::class, 'email'])->name('v1.lookup.email');
+        Route::get('/lookup/history', [LookupController::class, 'history'])->name('v1.lookup.history');
+        Route::get('/lookup/{uuid}', [LookupController::class, 'show'])->name('v1.lookup.show');
 
         // Quota
-        Route::get('/quota', [QuotaController::class, 'show']);
+        Route::get('/quota', [QuotaController::class, 'show'])->name('v1.quota');
     });

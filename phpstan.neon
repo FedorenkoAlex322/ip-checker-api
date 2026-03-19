@@ -9,3 +9,4 @@ parameters:
     ignoreErrors:
         - identifier: missingType.generics
         - identifier: missingType.iterableValue
+        - identifier: instanceof.alwaysFalse

@@ -6,6 +6,7 @@ namespace App\Services\CircuitBreaker;
 
 use App\Contracts\CircuitBreakerInterface;
 use App\Enums\CircuitState;
+use App\Events\CircuitBreakerStateChanged;
 use Illuminate\Redis\Connections\Connection;
 use Illuminate\Support\Facades\Redis;
 
@@ -30,7 +31,9 @@ final class CircuitBreakerService implements CircuitBreakerInterface
 
     public function recordSuccess(string $service): void
     {
-        $this->atomic($service, function (array $data) use ($service): array {
+        $stateTransition = null;
+
+        $this->atomic($service, function (array $data) use ($service, &$stateTransition): array {
             $state = CircuitState::from($data['state']);
 
             if ($state === CircuitState::HalfOpen) {
@@ -39,6 +42,7 @@ final class CircuitBreakerService implements CircuitBreakerInterface
 
                 if ($data['success_count'] >= $successThreshold) {
                     $data = $this->buildClosedState();
+                    $stateTransition = [CircuitState::HalfOpen, CircuitState::Closed];
                 }
             }
 
@@ -48,11 +52,17 @@ final class CircuitBreakerService implements CircuitBreakerInterface
 
             return $data;
         });
+
+        if ($stateTransition !== null) {
+            CircuitBreakerStateChanged::dispatch($service, $stateTransition[0], $stateTransition[1]);
+        }
     }
 
     public function recordFailure(string $service): void
     {
-        $this->atomic($service, function (array $data) use ($service): array {
+        $stateTransition = null;
+
+        $this->atomic($service, function (array $data) use ($service, &$stateTransition): array {
             $state = CircuitState::from($data['state']);
 
             if ($state === CircuitState::HalfOpen) {
@@ -60,6 +70,7 @@ final class CircuitBreakerService implements CircuitBreakerInterface
                 $data['opened_at'] = now()->timestamp;
                 $data['failure_count'] = 1;
                 $data['success_count'] = 0;
+                $stateTransition = [CircuitState::HalfOpen, CircuitState::Open];
 
                 return $data;
             }
@@ -73,10 +84,15 @@ final class CircuitBreakerService implements CircuitBreakerInterface
                 $data['state'] = CircuitState::Open->value;
                 $data['opened_at'] = now()->timestamp;
                 $data['success_count'] = 0;
+                $stateTransition = [CircuitState::Closed, CircuitState::Open];
             }
 
             return $data;
         });
+
+        if ($stateTransition !== null) {
+            CircuitBreakerStateChanged::dispatch($service, $stateTransition[0], $stateTransition[1]);
+        }
     }
 
     public function getState(string $service): CircuitState
@@ -92,6 +108,8 @@ final class CircuitBreakerService implements CircuitBreakerInterface
                 $data['state'] = CircuitState::HalfOpen->value;
                 $data['success_count'] = 0;
                 $this->saveData($service, $data);
+
+                CircuitBreakerStateChanged::dispatch($service, CircuitState::Open, CircuitState::HalfOpen);
 
                 return CircuitState::HalfOpen;
             }

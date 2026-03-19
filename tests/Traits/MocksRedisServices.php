@@ -11,7 +11,10 @@ use App\Contracts\RateLimiterInterface;
 use App\DTOs\QuotaStatus;
 use App\DTOs\RateLimitResult;
 use App\Enums\ApiKeyTier;
+use App\Events\LookupCompleted;
+use App\Events\LookupFailed;
 use App\Models\ApiKey;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\MockInterface;
 
@@ -53,6 +56,9 @@ trait MocksRedisServices
         $this->mockQuotaService();
         $this->mockLookupCache();
         $this->mockCircuitBreaker();
+
+        // Fake events to prevent listeners from calling real Redis
+        Event::fake([LookupCompleted::class, LookupFailed::class]);
     }
 
     // ------------------------------------------------------------------

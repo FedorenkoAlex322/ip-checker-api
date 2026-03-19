@@ -15,7 +15,7 @@ final class LogApiKeyCreatedListener implements ShouldQueue
         Log::info('API key created', [
             'api_key_id' => $event->apiKeyId,
             'name' => $event->name,
-            'tier' => $event->tier,
+            'tier' => $event->tier->value,
         ]);
     }
 }

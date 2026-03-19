@@ -13,8 +13,11 @@ use App\Contracts\RetryableInterface;
 use App\DTOs\CachedLookupResult;
 use App\DTOs\LookupResult;
 use App\Enums\LookupType;
+use App\Events\LookupCompleted;
+use App\Events\LookupFailed;
 use App\Exceptions\ProviderUnavailableException;
 use App\Services\Lookup\LookupService;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Mockery;
 use Mockery\MockInterface;
@@ -142,15 +145,12 @@ final class LookupServiceTest extends TestCase
             ->once()
             ->with('mock');
 
-        $this->cache
-            ->shouldReceive('put')
-            ->once()
-            ->with($target, $type, $providerResult);
-
         $this->resultRepository
             ->shouldReceive('store')
             ->once()
             ->with($providerResult, $apiKeyId);
+
+        Event::fake([LookupCompleted::class]);
 
         // Act
         $result = $this->service->lookup($target, $type, $apiKeyId);
@@ -159,6 +159,7 @@ final class LookupServiceTest extends TestCase
         $this->assertSame('fresh-uuid', $result->uuid);
         $this->assertFalse($result->cached);
         $this->assertSame(120.0, $result->lookupTimeMs);
+        Event::assertDispatched(LookupCompleted::class);
     }
 
     #[Test]
@@ -191,6 +192,7 @@ final class LookupServiceTest extends TestCase
             ->once()
             ->with('failing');
 
+        Event::fake([LookupFailed::class]);
         Log::shouldReceive('warning')->once();
         Log::shouldReceive('error')->once();
         Log::shouldReceive('info')->once();
@@ -289,8 +291,8 @@ final class LookupServiceTest extends TestCase
             ->once()
             ->with('test-provider');
 
-        $this->cache->shouldReceive('put')->once();
         $this->resultRepository->shouldReceive('store')->once();
+        Event::fake([LookupCompleted::class]);
 
         // Act
         $result = $this->service->lookup($target, $type, 1);
@@ -298,6 +300,7 @@ final class LookupServiceTest extends TestCase
         // Assert
         $this->assertSame('uuid-success', $result->uuid);
         $this->assertSame('test-provider', $result->provider);
+        Event::assertDispatched(LookupCompleted::class);
     }
 
     #[Test]
@@ -327,6 +330,7 @@ final class LookupServiceTest extends TestCase
             ->once()
             ->with('failing-provider');
 
+        Event::fake([LookupFailed::class]);
         Log::shouldReceive('warning')->once();
         Log::shouldReceive('error')->once();
         Log::shouldReceive('info')->once();

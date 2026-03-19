@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\DTOs\LookupResult;
+use App\Enums\LookupType;
 use App\Models\LookupResult as LookupResultModel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -53,7 +54,7 @@ final class LookupResultResource extends JsonResource
             'data' => [
                 'uuid' => $model->uuid,
                 'target' => $model->target,
-                'type' => $model->type,
+                'type' => $model->type instanceof LookupType ? $model->type->value : $model->type,
                 'result' => $model->result_data,
                 'cached' => $model->cached,
             ],

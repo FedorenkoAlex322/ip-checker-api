@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Contracts\QuotaServiceInterface;
+use App\Events\QuotaExceeded;
 use App\Exceptions\QuotaExceededException;
 use Closure;
 use Illuminate\Http\Request;
@@ -25,6 +26,11 @@ final class CheckQuota
 
         if (! $quotaStatus->allowed) {
             $quotaType = $quotaStatus->remainingDaily() <= 0 ? 'daily' : 'monthly';
+            $currentUsage = $quotaType === 'daily' ? $quotaStatus->dailyUsed : $quotaStatus->monthlyUsed;
+            $limit = $quotaType === 'daily' ? $quotaStatus->dailyLimit : $quotaStatus->monthlyLimit;
+
+            QuotaExceeded::dispatch($apiKeyId, $quotaType, $currentUsage, $limit);
+
             throw new QuotaExceededException($quotaType);
         }
 

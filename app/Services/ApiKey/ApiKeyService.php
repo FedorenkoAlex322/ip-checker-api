@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\ApiKey;
 
 use App\Enums\ApiKeyTier;
+use App\Events\ApiKeyCreated;
 use App\Exceptions\InvalidApiKeyException;
 use App\Models\ApiKey;
 
@@ -20,7 +21,7 @@ final class ApiKeyService
 
         $limits = $this->getLimitsForTier($tier);
 
-        ApiKey::create([
+        $apiKey = ApiKey::create([
             'key_hash' => $hash,
             'name' => $name,
             'tier' => $tier,
@@ -28,6 +29,8 @@ final class ApiKeyService
             'monthly_limit' => $limits['monthly_limit'],
             'rate_limit_per_minute' => $limits['requests_per_minute'],
         ]);
+
+        ApiKeyCreated::dispatch($apiKey->id, $name, $tier);
 
         return $plaintext;
     }

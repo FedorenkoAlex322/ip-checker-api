@@ -24,11 +24,13 @@ final class SyncQuotaToDatabaseJob implements ShouldQueue
 
     public function handle(): void
     {
-        $apiKeys = ApiKey::where('is_active', true)->get();
+        $apiKeys = ApiKey::where('is_active', true)->cursor();
         $today = now()->toDateString();
         $synced = 0;
+        $totalKeys = 0;
 
         foreach ($apiKeys as $apiKey) {
+            $totalKeys++;
             $redisKey = "quota:{$apiKey->id}:daily:{$today}";
             $count = (int) Redis::get($redisKey);
 
@@ -42,7 +44,7 @@ final class SyncQuotaToDatabaseJob implements ShouldQueue
         }
 
         Log::info('Quota synced to database', [
-            'total_keys' => $apiKeys->count(),
+            'total_keys' => $totalKeys,
             'synced' => $synced,
             'date' => $today,
         ]);
