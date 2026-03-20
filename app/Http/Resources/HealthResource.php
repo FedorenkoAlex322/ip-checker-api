@@ -13,6 +13,7 @@ final class HealthResource extends JsonResource
      *   'status'           => 'healthy'|'degraded'|'unhealthy',
      *   'services'         => ['mysql' => 'up'|'down', 'redis' => 'up'|'down', ...],
      *   'circuit_breakers' => ['mock' => 'closed'|'open'|'half-open', ...],
+     *   'providers'        => ['name' => ['status' => 'active'|'misconfigured'|'circuit_open', 'reason' => '...'], ...],
      *   'timestamp'        => \DateTimeInterface|string,
      * ]
      *
@@ -40,6 +41,7 @@ final class HealthResource extends JsonResource
                 'status' => $health['status'],
                 'services' => $health['services'] ?? [],
                 'circuit_breakers' => $health['circuit_breakers'] ?? [],
+                'providers' => $health['providers'] ?? [],
                 'timestamp' => $timestamp,
             ],
         ];

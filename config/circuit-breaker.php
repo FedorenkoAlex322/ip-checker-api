@@ -16,15 +16,18 @@ return [
     ],
 
     'providers' => [
-        // Per-provider overrides
-        // 'abuseipdb' => [
-        //     'failure_threshold' => 3,
-        //     'recovery_timeout' => 60,
-        //     'retry' => [
-        //         'max_retries' => 2,
-        //         'base_delay_ms' => 500,
-        //     ],
-        // ],
+        'abuseipdb' => [
+            'failure_threshold' => 3,
+            'recovery_timeout' => 60,
+        ],
+        'virustotal' => [
+            'failure_threshold' => 3,
+            'recovery_timeout' => 60,
+        ],
+        'emailrep' => [
+            'failure_threshold' => 3,
+            'recovery_timeout' => 60,
+        ],
     ],
 
     'redis_prefix' => 'circuit',

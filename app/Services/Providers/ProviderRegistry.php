@@ -63,6 +63,14 @@ final class ProviderRegistry implements ProviderRegistryInterface
         ));
     }
 
+    /**
+     * @return array<LookupProviderInterface>
+     */
+    public function getAllProviders(): array
+    {
+        return $this->providers;
+    }
+
     private function isProviderAvailable(LookupProviderInterface $provider, LookupType $type): bool
     {
         return $provider->supports($type)

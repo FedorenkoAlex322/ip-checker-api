@@ -10,6 +10,7 @@ enum ErrorCode: string
     case ProviderUnavailable = 'PROVIDER_UNAVAILABLE';
     case CircuitBreakerOpen = 'CIRCUIT_BREAKER_OPEN';
     case MaxRetriesExceeded = 'MAX_RETRIES_EXCEEDED';
+    case ProviderError = 'PROVIDER_ERROR';
     case LookupNotFound = 'LOOKUP_NOT_FOUND';
     case ValidationError = 'VALIDATION_ERROR';
     case InternalError = 'INTERNAL_ERROR';
@@ -23,6 +24,7 @@ enum ErrorCode: string
             self::ProviderUnavailable => 503,
             self::CircuitBreakerOpen => 503,
             self::MaxRetriesExceeded => 502,
+            self::ProviderError => 502,
             self::LookupNotFound => 404,
             self::ValidationError => 422,
             self::InternalError => 500,
@@ -38,6 +40,7 @@ enum ErrorCode: string
             self::ProviderUnavailable => 'External provider is temporarily unavailable.',
             self::CircuitBreakerOpen => 'Service is temporarily unavailable due to repeated failures.',
             self::MaxRetriesExceeded => 'Maximum retry attempts exceeded. Please try again later.',
+            self::ProviderError => 'External provider error.',
             self::LookupNotFound => 'The requested lookup was not found.',
             self::ValidationError => 'Validation failed. Please check the request parameters.',
             self::InternalError => 'An internal server error occurred.',

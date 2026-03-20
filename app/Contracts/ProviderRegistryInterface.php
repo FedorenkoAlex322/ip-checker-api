@@ -14,4 +14,9 @@ interface ProviderRegistryInterface
      * @return array<LookupProviderInterface>
      */
     public function getAvailableProviders(LookupType $type): array;
+
+    /**
+     * @return array<LookupProviderInterface>
+     */
+    public function getAllProviders(): array;
 }
