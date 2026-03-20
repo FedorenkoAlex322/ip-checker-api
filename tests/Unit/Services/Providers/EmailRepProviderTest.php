@@ -165,28 +165,28 @@ final class EmailRepProviderTest extends TestCase
     }
 
     #[Test]
-    public function test_is_enabled_always_true_no_key_required(): void
+    public function test_is_enabled_with_api_key(): void
     {
         // Assert
         $this->assertTrue($this->provider->isEnabled());
     }
 
     #[Test]
-    public function test_is_enabled_true_even_without_api_key(): void
+    public function test_is_disabled_without_api_key(): void
     {
         // Arrange
         config()->set('ip-checker.providers.emailrep.api_key', null);
         $provider = new EmailRepProvider;
 
-        // Assert - emailrep does not require key
-        $this->assertTrue($provider->isEnabled());
+        // Assert
+        $this->assertFalse($provider->isEnabled());
     }
 
     #[Test]
-    public function test_does_not_require_api_key(): void
+    public function test_requires_api_key(): void
     {
         // Assert
-        $this->assertFalse($this->provider->requiresApiKey());
+        $this->assertTrue($this->provider->requiresApiKey());
     }
 
     #[Test]
