@@ -88,11 +88,16 @@ final class CheckProvidersCommand extends Command
             return '-';
         }
 
-        if (! $provider->requiresApiKey()) {
-            return '-';
+        if ($provider->requiresApiKey()) {
+            return $provider->getApiKey() !== null ? "\u{2713}" : "\u{2717} MISSING";
         }
 
-        return $provider->getApiKey() !== null ? "\u{2713}" : "\u{2717}";
+        // Key is optional — show whether it's configured
+        if ($provider->getApiKey() !== null) {
+            return "\u{2713} optional";
+        }
+
+        return '~ no key';
     }
 
     /**
@@ -119,9 +124,20 @@ final class CheckProvidersCommand extends Command
 
             return ['ok' => true, 'message' => "OK ({$elapsedMs}ms)"];
         } catch (Throwable $e) {
-            $reason = mb_strlen($e->getMessage()) > 60
-                ? mb_substr($e->getMessage(), 0, 57).'...'
-                : $e->getMessage();
+            $reason = $e->getMessage();
+
+            // Hint about optional API key when rate-limited without one
+            $hasNoKey = $provider instanceof AbstractHttpProvider
+                && ! $provider->requiresApiKey()
+                && $provider->getApiKey() === null;
+
+            if ($hasNoKey && str_contains($reason, 'Rate limit')) {
+                return ['ok' => false, 'message' => 'FAILED: Rate limited (configure API key for higher limits)'];
+            }
+
+            if (mb_strlen($reason) > 60) {
+                $reason = mb_substr($reason, 0, 57).'...';
+            }
 
             return ['ok' => false, 'message' => "FAILED: {$reason}"];
         }
