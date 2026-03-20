@@ -1,6 +1,11 @@
 <?php
 
+use App\Services\Providers\AbuseIpDbProvider;
+use App\Services\Providers\EmailRepProvider;
+use App\Services\Providers\IpApiProvider;
+use App\Services\Providers\IpInfoProvider;
 use App\Services\Providers\MockProvider;
+use App\Services\Providers\VirusTotalProvider;
 
 return [
     /*
@@ -16,16 +21,40 @@ return [
             'supports' => ['ip', 'domain', 'email'],
             'delay_ms' => env('PROVIDER_MOCK_DELAY_MS', 50),
         ],
-        // Real providers will be added here
-        // 'abuseipdb' => [
-        //     'enabled' => env('PROVIDER_ABUSEIPDB_ENABLED', false),
-        //     'class' => \App\Services\Providers\AbuseIpDbProvider::class,
-        //     'priority' => 10,
-        //     'supports' => ['ip'],
-        //     'api_key' => env('PROVIDER_ABUSEIPDB_KEY'),
-        //     'base_url' => 'https://api.abuseipdb.com/api/v2',
-        //     'timeout' => 5,
-        // ],
+        'abuseipdb' => [
+            'class' => AbuseIpDbProvider::class,
+            'priority' => 10,
+            'api_key' => env('ABUSEIPDB_API_KEY'),
+            'base_url' => 'https://api.abuseipdb.com/api/v2',
+            'timeout' => 10,
+        ],
+        'virustotal' => [
+            'class' => VirusTotalProvider::class,
+            'priority' => 20,
+            'api_key' => env('VIRUSTOTAL_API_KEY'),
+            'base_url' => 'https://www.virustotal.com/api/v3',
+            'timeout' => 15,
+        ],
+        'ip_api' => [
+            'class' => IpApiProvider::class,
+            'priority' => 30,
+            'base_url' => 'http://ip-api.com/json',
+            'timeout' => 5,
+        ],
+        'ipinfo' => [
+            'class' => IpInfoProvider::class,
+            'priority' => 40,
+            'api_key' => env('IPINFO_TOKEN'),
+            'base_url' => 'https://ipinfo.io',
+            'timeout' => 5,
+        ],
+        'emailrep' => [
+            'class' => EmailRepProvider::class,
+            'priority' => 10,
+            'api_key' => env('EMAILREP_API_KEY'),
+            'base_url' => 'https://emailrep.io',
+            'timeout' => 10,
+        ],
     ],
 
     /*

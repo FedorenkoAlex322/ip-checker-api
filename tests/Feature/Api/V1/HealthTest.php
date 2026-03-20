@@ -3,6 +3,8 @@
 namespace Tests\Feature\Api\V1;
 
 use App\Contracts\CircuitBreakerInterface;
+use App\Contracts\ProviderRegistryInterface;
+use App\Enums\CircuitState;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Redis;
 use Mockery;
@@ -16,6 +18,7 @@ final class HealthTest extends TestCase
     {
         parent::setUp();
         $this->mockCircuitBreaker();
+        $this->mockProviderRegistry();
         $this->mockRedis();
     }
 
@@ -44,6 +47,7 @@ final class HealthTest extends TestCase
                     'status',
                     'services',
                     'circuit_breakers',
+                    'providers',
                     'timestamp',
                 ],
             ]);
@@ -82,7 +86,15 @@ final class HealthTest extends TestCase
     {
         $mock = Mockery::mock(CircuitBreakerInterface::class);
         $mock->shouldReceive('getAllStates')->andReturn([]);
+        $mock->shouldReceive('getState')->andReturn(CircuitState::Closed);
         $this->app->instance(CircuitBreakerInterface::class, $mock);
+    }
+
+    private function mockProviderRegistry(): void
+    {
+        $mock = Mockery::mock(ProviderRegistryInterface::class);
+        $mock->shouldReceive('getAllProviders')->andReturn([]);
+        $this->app->instance(ProviderRegistryInterface::class, $mock);
     }
 
     private function mockRedis(): void
