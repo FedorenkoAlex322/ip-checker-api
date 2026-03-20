@@ -25,7 +25,7 @@ final class EmailRepProvider extends AbstractHttpProvider
 
     public function requiresApiKey(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -41,18 +41,11 @@ final class EmailRepProvider extends AbstractHttpProvider
      */
     protected function getHeaders(): array
     {
-        $headers = [
+        return [
             'User-Agent' => 'IpCheckerApi/1.0',
             'Accept' => 'application/json',
+            'Key' => $this->getApiKeyOrFail(),
         ];
-
-        $apiKey = $this->getApiKey();
-
-        if ($apiKey !== null) {
-            $headers['Key'] = $apiKey;
-        }
-
-        return $headers;
     }
 
     /**
