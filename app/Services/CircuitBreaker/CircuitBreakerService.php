@@ -130,21 +130,23 @@ final class CircuitBreakerService implements CircuitBreakerInterface
         $prefixLength = strlen($this->prefix) + 1;
         $states = [];
 
-        /** @var Connection $connection */
-        $connection = Redis::connection();
+        /** @var \Redis $client */
+        $client = Redis::connection()->client();
         $cursor = null;
 
         do {
-            /** @var array{0: string, 1: string[]} $result */
-            $result = $connection->command('scan', [$cursor ?? '0', 'MATCH', $pattern, 'COUNT', '100']);
-            $cursor = $result[0];
-            $keys = $result[1];
+            /** @var string[]|false $keys */
+            $keys = $client->scan($cursor, $pattern, 100);
+
+            if ($keys === false) {
+                break;
+            }
 
             foreach ($keys as $key) {
                 $serviceName = substr((string) $key, $prefixLength);
                 $states[$serviceName] = $this->getState($serviceName);
             }
-        } while ((string) $cursor !== '0');
+        } while ($cursor > 0);
 
         return $states;
     }
