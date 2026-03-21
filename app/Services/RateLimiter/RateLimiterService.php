@@ -54,15 +54,12 @@ final class RateLimiterService implements RateLimiterInterface
         $member = Str::uuid()->toString();
 
         /** @var array{0: int, 1: int, 2: int} $result */
-        $result = Redis::connection()->command('eval', [
+        $client = Redis::connection()->client();
+        $result = $client->eval(
             self::LUA_ATTEMPT_SCRIPT,
-            1,
-            $redisKey,
-            (string) $now,
-            (string) $decaySeconds,
-            (string) $maxAttempts,
-            $member,
-        ]);
+            [$redisKey, (string) $now, (string) $decaySeconds, (string) $maxAttempts, $member],
+            1
+        );
 
         $allowed = (bool) $result[0];
         $remaining = (int) $result[1];
