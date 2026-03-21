@@ -169,7 +169,7 @@ final class CircuitBreakerService implements CircuitBreakerInterface
             $connection->command('watch', [$key]);
 
             $raw = $connection->command('get', [$key]);
-            $data = $raw !== null ? json_decode((string) $raw, true) : $this->buildClosedState();
+            $data = ($raw !== null && $raw !== false) ? json_decode((string) $raw, true) : $this->buildClosedState();
 
             $updated = $callback($data);
 
@@ -179,7 +179,7 @@ final class CircuitBreakerService implements CircuitBreakerInterface
             /** @var array|null $execResult */
             $execResult = $connection->command('exec');
 
-            if ($execResult !== null) {
+            if ($execResult !== null && $execResult !== false) {
                 return;
             }
 
@@ -201,7 +201,7 @@ final class CircuitBreakerService implements CircuitBreakerInterface
         $key = $this->getRedisKey($service);
         $raw = Redis::get($key);
 
-        if ($raw === null) {
+        if ($raw === null || $raw === false) {
             return $this->buildClosedState();
         }
 

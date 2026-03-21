@@ -65,7 +65,7 @@ final class QuotaService implements QuotaServiceInterface
         $key = $this->getDailyKey($apiKeyId);
         $count = Redis::get($key);
 
-        if ($count === null) {
+        if ($count === null || $count === false) {
             $count = $this->loadDailyFromDatabase($apiKeyId, now()->toDateString());
 
             if ($count > 0) {
@@ -81,7 +81,7 @@ final class QuotaService implements QuotaServiceInterface
         $key = $this->getMonthlyKey($apiKeyId);
         $count = Redis::get($key);
 
-        if ($count === null) {
+        if ($count === null || $count === false) {
             $count = $this->loadMonthlyFromDatabase($apiKeyId);
 
             if ($count > 0) {
